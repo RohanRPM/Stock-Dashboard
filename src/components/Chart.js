@@ -1,17 +1,7 @@
 import React, { useState } from 'react';
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import CanvasJSReact from '@canvasjs/react-charts';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const StockChart = ({ data }) => {
   const [days, setDays] = useState('30d'); // Default filter for 30 days
@@ -37,51 +27,57 @@ const StockChart = ({ data }) => {
   // Calculate filtered data based on selected days
   const filteredData = data.slice(-dayMapping[days]);
 
-  const chartData = {
-    labels: filteredData.map((item) => item.Date),
-    datasets: [
+  // Prepare dataPoints for the candlestick graph
+  const dataPoints = filteredData.map((item) => ({
+    x: new Date(item.Date),
+    y: [item['Open Price'], item['High Price'], item['Low Price'], item['Close Price']],
+  }));
+
+  // Calculate dynamic axisY range
+  const prices = filteredData.flatMap((item) => [
+    item['Open Price'],
+    item['High Price'],
+    item['Low Price'],
+    item['Close Price'],
+  ]);
+  const maxPrice = Math.max(...prices) + 200; // Add 200 for upper range
+  const minPrice = maxPrice - 700; // Subtract 700 for lower range
+
+  const options = {
+    theme: 'light2',
+    animationEnabled: true,
+    exportEnabled: true,
+    height: 500, // Adjust chart height
+    title: {
+      text: `Stock Price Trends - Last ${days}`,
+    },
+    axisX: {
+      valueFormatString: 'MMM DD YYYY',
+      crosshair: {
+        enabled: true,
+        color: "orange",
+        labelFontColor: "#F8F8F8"
+      }
+    },
+    axisY: {
+      prefix: '₹',
+      title: 'Price (in Rs)',
+      minimum: minPrice < 0 ? 0 : minPrice, // Ensure minimum is not negative
+      maximum: maxPrice,
+    },
+    data: [
       {
-        label: 'Close Price',
-        data: filteredData.map((item) => item['Close Price']),
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        fill: true,
-      },
-      {
-        label: 'Open Price',
-        data: filteredData.map((item) => item['Open Price']),
-        borderColor: 'rgba(54, 162, 235, 1)',
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        fill: true,
-      },
-      {
-        label: 'High Price',
-        data: filteredData.map((item) => item['High Price']),
-        borderColor: 'rgba(255, 99, 132, 1)',
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        fill: true,
-      },
-      {
-        label: 'Low Price',
-        data: filteredData.map((item) => item['Low Price']),
-        borderColor: 'rgba(255, 206, 86, 1)',
-        backgroundColor: 'rgba(255, 206, 86, 0.2)',
-        fill: true,
+        type: 'candlestick',
+        showInLegend: true,
+        name: 'Stock Prices',
+        yValueFormatString: 'Rs. ###0.00',
+        xValueFormatString: 'MMM DD, YYYY',
+        risingColor: '#4CAF50', // Green color for rising candles
+        fallingColor: '#F44336', // Red color for falling candles
+        lineThickness: 0, // Removes borders from the candles
+        dataPoints: dataPoints,
       },
     ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: `Stock Price Trends - Last ${days}`,
-      },
-    },
   };
 
   const containerStyle = {
@@ -120,7 +116,7 @@ const StockChart = ({ data }) => {
     <div style={containerStyle}>
       {/* Chart Section */}
       <div style={chartStyle}>
-        <Line data={chartData} options={chartOptions} />
+        <CanvasJSChart options={options} />
       </div>
 
       {/* Filter Section */}
