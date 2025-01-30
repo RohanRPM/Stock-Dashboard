@@ -50,20 +50,35 @@ const StockChart = ({ data }) => {
     height: 500, // Adjust chart height
     title: {
       text: `Stock Price Trends - Last ${days}`,
+      fontSize: 24,
+      fontWeight: 'bold',
+      fontFamily: 'Arial, sans-serif',
+      padding: 10,
+      fontColor: 'black', // Soft yellow for title text
     },
     axisX: {
       valueFormatString: 'MMM DD YYYY',
       crosshair: {
         enabled: true,
-        color: "orange",
-        labelFontColor: "#F8F8F8"
-      }
+        //background black font white
+        color: '#E23E57', // Vibrant accent color for crosshair
+        labelFontColor: 'white', // Soft yellow for crosshair label
+      
+      },
+      labelFontSize: 12,
+      labelFontColor: 'black', // Soft yellow for axis labels
+      titleFontSize: 14,
+      titleFontColor: 'black', // Soft yellow for axis title
     },
     axisY: {
       prefix: '₹',
       title: 'Price (in Rs)',
       minimum: minPrice < 0 ? 0 : minPrice, // Ensure minimum is not negative
       maximum: maxPrice,
+      labelFontSize: 12,
+      labelFontColor: 'black', // Soft yellow for axis labels
+      titleFontSize: 14,
+      titleFontColor: 'black', // Soft yellow for axis title
     },
     data: [
       {
@@ -87,20 +102,24 @@ const StockChart = ({ data }) => {
     width: '90%',
     margin: '20px auto',
     padding: '20px',
-    backgroundColor: '#f7f9fc',
+    backgroundColor: '#522546', // Darker background for container
     borderRadius: '10px',
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
   };
 
   const chartStyle = {
     flex: 3,
+    backgroundColor: '#311D3F', // Dark background for chart
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
   };
 
   const filterStyle = {
     flex: 1,
     marginLeft: '20px',
-    backgroundColor: '#fff',
-    padding: '15px',
+    backgroundColor: '#311D3F', // Dark background for filter
+    padding: '20px',
     borderRadius: '10px',
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
   };
@@ -109,7 +128,18 @@ const StockChart = ({ data }) => {
     width: '100%',
     padding: '10px',
     borderRadius: '5px',
-    border: '1px solid #ccc',
+    border: '1px solid #88304E', // Muted accent color for border
+    fontSize: '14px',
+    color: '#FFF2AF', // Soft yellow for text
+    backgroundColor: '#522546', // Darker background for select
+    cursor: 'pointer',
+  };
+
+  const labelStyle = {
+    fontSize: '16px',
+    fontWeight: 'bold',
+    color: '#FFF2AF', // Soft yellow for label text
+    marginBottom: '10px',
   };
 
   return (
@@ -121,7 +151,7 @@ const StockChart = ({ data }) => {
 
       {/* Filter Section */}
       <div style={filterStyle}>
-        <h3 style={{ textAlign: 'center', marginBottom: '15px' }}>Filter by Days</h3>
+        <h3 style={labelStyle}>Filter by Days</h3>
         <select
           value={days}
           onChange={(e) => setDays(e.target.value)}
