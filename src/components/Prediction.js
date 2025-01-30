@@ -118,29 +118,30 @@ const Prediction = ({ stockData }) => {
                 data={formatChartData(prediction.actuals, prediction.predictions)}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#88304E" />
+                <XAxis dataKey="day" stroke="#FFF2AF" />
                 <YAxis
                   domain={calculateYAxisDomain(prediction.actuals, prediction.predictions).map(val => Number(val.toFixed(2)))}
                   type="number"
-                  label={{ value: 'Price', angle: -90, position: 'insideLeft' }}
+                  stroke="#FFF2AF"
+                  label={{ value: 'Price', angle: -90, position: 'insideLeft', fill: '#FFF2AF' }}
                 />
-                <Tooltip />
-                <Legend />
+                <Tooltip contentStyle={{ backgroundColor: '#522546', border: 'none', color: '#FFF2AF' }} />
+                <Legend wrapperStyle={{ color: '#FFF2AF' }} />
                 <Line
                   type="monotone"
                   dataKey="actual"
-                  stroke="#8884d8"
+                  stroke="black" // Vibrant accent color for actual prices
                   name="Actual Price"
-                  strokeWidth={2}
+                  strokeWidth={4}
                   dot={{ r: 4 }}
                 />
                 <Line
                   type="monotone"
                   dataKey="predicted"
-                  stroke="#82ca9d"
+                  stroke="red" // Soft yellow for predicted prices
                   name="Predicted Price"
-                  strokeWidth={2}
+                  strokeWidth={4}
                   dot={{ r: 4 }}
                 />
               </LineChart>
@@ -168,12 +169,12 @@ const Prediction = ({ stockData }) => {
                 ]}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" stroke="#88304E" />
+                <XAxis dataKey="name" stroke="#FFF2AF" />
+                <YAxis stroke="#FFF2AF" />
                 <Tooltip />
-                <Legend />
-                <Bar dataKey="value" fill="#8884d8" />
+                <Legend  />
+                <Bar dataKey="value" fill="#E23E57" /> {/* Vibrant accent color for bars */}
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -187,49 +188,49 @@ const styles = {
   predictionWrapper: {
     marginTop: '20px',
     padding: '20px',
-    background: '#fff',
+    background: '#522546', // Darker background for container
     borderRadius: '10px',
     boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
     textAlign: 'center',
   },
   title: {
     fontSize: '1.5rem',
-    color: '#34495e',
+    color: '#FFF2AF', // Soft yellow for title
     marginBottom: '15px',
   },
   button: {
     padding: '10px 20px',
     fontSize: '1rem',
-    color: '#fff',
-    background: '#3498db',
+    color: '#311D3F', // Dark text for contrast
+    background: '#FFF2AF', // Soft yellow for button
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
     transition: 'background 0.3s ease',
   },
   buttonDisabled: {
-    background: '#bdc3c7',
+    background: '#88304E', // Muted accent color for disabled button
     cursor: 'not-allowed',
   },
   loading: {
-    color: '#7f8c8d',
+    color: '#FFF2AF', // Soft yellow for loading text
     marginTop: '10px',
     fontSize: '1rem',
   },
   errorContainer: {
     marginTop: '10px',
     padding: '10px',
-    background: '#f8d7da',
+    background: '#E23E57', // Vibrant accent color for error container
     borderRadius: '5px',
-    border: '1px solid #f5c6cb',
+    border: '1px solid #88304E',
   },
   error: {
-    color: '#721c24',
+    color: '#FFF2AF', // Soft yellow for error text
     fontSize: '1rem',
     margin: '0',
   },
   errorHint: {
-    color: '#721c24',
+    color: '#FFF2AF', // Soft yellow for error hint text
     fontSize: '0.9rem',
     margin: '5px 0 0',
   },
@@ -239,7 +240,7 @@ const styles = {
   },
   resultTitle: {
     fontSize: '1.3rem',
-    color: '#2c3e50',
+    color: '#FFF2AF', // Soft yellow for result title
     marginBottom: '15px',
     textAlign: 'center',
   },
@@ -248,7 +249,7 @@ const styles = {
   },
   sectionTitle: {
     fontSize: '1.1rem',
-    color: '#34495e',
+    color: '#FFF2AF', // Soft yellow for section titles
     marginBottom: '10px',
   },
 };
