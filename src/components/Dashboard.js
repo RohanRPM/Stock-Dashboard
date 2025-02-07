@@ -39,7 +39,9 @@ const Dashboard = () => {
           <div style={styles.chartWrapper}>
             <StockChart data={stockData} />
           </div>
-          <Prediction stockData={stockData} />
+          <Prediction stockData={stockData} 
+            selectedCompany= {selectedCompany}
+          />
         </>
       ) : (
         <p style={styles.noData}>No data available for the selected company.</p>

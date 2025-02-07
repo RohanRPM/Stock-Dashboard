@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import axios from 'axios';
 import {
   LineChart,
@@ -12,24 +12,50 @@ import {
   BarChart,
   Bar,
 } from 'recharts';
-
-const Prediction = ({ stockData }) => {
+import { DaysContext } from '../context/DaysContext';
+const Prediction = ({ stockData, selectedCompany }) => { // Add selectedCompany prop
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+
+
+  const { days } = useContext(DaysContext); // Get days from context
+  
+  // 3. Add day mapping same as StockChart
+  const dayMapping = {
+    '1d': 1,
+    '2d': 2,
+    '3d': 3,
+    '7d': 7,
+    '10d': 10,
+    '15d': 15,
+    '30d': 30,
+    '60d': 60,
+    '90d': 90,
+    '180d': 180,
+    '1Yr': 365,
+    '2Yr': 730,
+    '3Yr': 1095,
+    '5Yr': 1825,
+  };
+
   const predictStock = async () => {
-    setLoading(true);
-    setError(null);
-    setPrediction(null); // Reset previous prediction
+    // 4. Calculate dates based on stockData and days context
+    const numericalDays = dayMapping[days];
+    const endDate = new Date(stockData[stockData.length - 1].Date);
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - numericalDays);
+
+    // Format dates to YYYY-MM-DD
+    const formatDate = (date) => date.toISOString().split('T')[0];
 
     try {
       const response = await axios.post('http://127.0.0.1:10000/predict', {
-        company_name: 'RL', // Replace with dynamic value if needed
-        start_date: '2018-04-02', // Replace with dynamic value if needed
-        end_date: '2019-04-20', // Replace with dynamic value if needed
+        company_name: selectedCompany, // Use prop from dashboard
+        start_date: formatDate(startDate),
+        end_date: formatDate(endDate),
       });
-
       if (response.data && response.data.message === 'Prediction successful') {
         setPrediction(response.data);
       } else {
@@ -99,12 +125,12 @@ const Prediction = ({ stockData }) => {
 
       {loading && <p style={styles.loading}>Loading prediction...</p>}
 
-      {error && (
+      {/* {error && (
         <div style={styles.errorContainer}>
           <p style={styles.error}>⚠️ {error}</p>
           <p style={styles.errorHint}>Please ensure the prediction server is running and try again.</p>
         </div>
-      )}
+      )} */}
 
       {prediction && (
         <div style={styles.resultContainer}>

@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import CanvasJSReact from '@canvasjs/react-charts';
+import { DaysContext } from '../context/DaysContext';
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const StockChart = ({ data }) => {
-  const [days, setDays] = useState('30d'); // Default filter for 30 days
+  const { days, setDays } = useContext(DaysContext); // Default filter for 30 days
 
   // Mapping filter values to the number of days
   const dayMapping = {
