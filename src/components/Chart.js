@@ -1,13 +1,13 @@
-import React, { useState,useContext } from 'react';
-import CanvasJSReact from '@canvasjs/react-charts';
+import React, { useState, useContext, useEffect } from 'react';
+import ReactApexChart from 'react-apexcharts';
 import { DaysContext } from '../context/DaysContext';
-
-const CanvasJSChart = CanvasJSReact.CanvasJSChart;
+import moment from 'moment';
 
 const StockChart = ({ data }) => {
-  const { days, setDays } = useContext(DaysContext); // Default filter for 30 days
+  const { days, setDays } = useContext(DaysContext);
+  const [series, setSeries] = useState([]);
+  const [options, setOptions] = useState({});
 
-  // Mapping filter values to the number of days
   const dayMapping = {
     '1d': 1,
     '2d': 2,
@@ -25,76 +25,119 @@ const StockChart = ({ data }) => {
     '5Yr': 1825,
   };
 
-  // Calculate filtered data based on selected days
-  const filteredData = data.slice(-dayMapping[days]);
+  useEffect(() => {
+    const filteredData = data.slice(-dayMapping[days]).filter(item => 
+      item.Date && 
+      !isNaN(new Date(item.Date)) && 
+      !isNaN(item['Open Price']) &&
+      !isNaN(item['High Price']) &&
+      !isNaN(item['Low Price']) &&
+      !isNaN(item['Close Price'])
+    );
+    const seriesData = filteredData.map(item => ({
+      x: new Date(item.Date),
+      y: [
+        item['Open Price'],
+        item['High Price'],
+        item['Low Price'],
+        item['Close Price']
+      ]
+    }));
 
-  // Prepare dataPoints for the candlestick graph
-  const dataPoints = filteredData.map((item) => ({
-    x: new Date(item.Date),
-    y: [item['Open Price'], item['High Price'], item['Low Price'], item['Close Price']],
-  }));
+    
 
-  // Calculate dynamic axisY range
-  const prices = filteredData.flatMap((item) => [
-    item['Open Price'],
-    item['High Price'],
-    item['Low Price'],
-    item['Close Price'],
-  ]);
-  const maxPrice = Math.max(...prices) + 200; // Add 200 for upper range
-  const minPrice = maxPrice - 700; // Subtract 700 for lower range
+    const prices = filteredData.flatMap(item => [
+      item['Open Price'],
+      item['High Price'],
+      item['Low Price'],
+      item['Close Price'],
+    ]);
+    
+    const maxPrice = Math.max(...prices) + 200;
+    const minPrice = Math.min(...prices) - 200;
 
-  const options = {
-    theme: 'light2',
-    animationEnabled: true,
-    exportEnabled: true,
-    height: 500, // Adjust chart height
-    title: {
-      text: `Stock Price Trends - Last ${days}`,
-      fontSize: 24,
-      fontWeight: 'bold',
-      fontFamily: 'Arial, sans-serif',
-      padding: 10,
-      fontColor: 'black', // Soft yellow for title text
-    },
-    axisX: {
-      valueFormatString: 'MMM DD YYYY',
-      crosshair: {
-        enabled: true,
-        //background black font white
-        color: '#E23E57', // Vibrant accent color for crosshair
-        labelFontColor: 'white', // Soft yellow for crosshair label
-      
-      },
-      labelFontSize: 12,
-      labelFontColor: 'black', // Soft yellow for axis labels
-      titleFontSize: 14,
-      titleFontColor: 'black', // Soft yellow for axis title
-    },
-    axisY: {
-      prefix: '₹',
-      title: 'Price (in Rs)',
-      minimum: minPrice < 0 ? 0 : minPrice, // Ensure minimum is not negative
-      maximum: maxPrice,
-      labelFontSize: 12,
-      labelFontColor: 'black', // Soft yellow for axis labels
-      titleFontSize: 14,
-      titleFontColor: 'black', // Soft yellow for axis title
-    },
-    data: [
-      {
+    setSeries([{ name: 'candle', data: seriesData }]);
+
+    setOptions({
+      chart: {
         type: 'candlestick',
-        showInLegend: true,
-        name: 'Stock Prices',
-        yValueFormatString: 'Rs. ###0.00',
-        xValueFormatString: 'MMM DD, YYYY',
-        risingColor: '#4CAF50', // Green color for rising candles
-        fallingColor: '#F44336', // Red color for falling candles
-        lineThickness: 0, // Removes borders from the candles
-        dataPoints: dataPoints,
+        height: 500,
+        background: '#311D3F',
+        foreColor: '#FFF2AF',
+        toolbar: {
+          show: true,
+          tools: {
+            download: true,
+            selection: true,
+            zoom: true,
+            zoomin: true,
+            zoomout: true,
+            pan: true,
+            reset: true
+          }
+        }
       },
-    ],
-  };
+      title: {
+        text: `Stock Price Trends - Last ${days}`,
+        align: 'left',
+        style: {
+          fontSize: '24px',
+          fontWeight: 'bold',
+          color: '#FFF2AF'
+        }
+      },
+      xaxis: {
+        type: 'datetime',
+        labels: {
+          formatter: function(val) {
+            return moment(val).format('MMM YYYY');
+          },
+          style: {
+            colors: '#FFF2AF'
+          }
+        }
+      },
+      yaxis: {
+        tooltip: {
+          enabled: true
+        },
+        min: minPrice,
+        max: maxPrice,
+        labels: {
+          formatter: (value) => `₹${value.toFixed(2)}`,
+          style: {
+            colors: '#FFF2AF'
+          }
+        }
+      },
+      plotOptions: {
+        candlestick: {
+          colors: {
+            upward: '#4CAF50',
+            downward: '#F44336'
+          },
+          wick: {
+            useFillColor: true
+          }
+        }
+      },
+      tooltip: {
+        enabled: true,
+        theme: 'dark',
+        style: {
+          fontSize: '12px'
+        },
+        x: {
+          formatter: function(val) {
+            return moment(val).format('MMM DD, YYYY HH:mm');
+          }
+        },
+        y: {
+          formatter: (value) => `₹${value.toFixed(2)}`
+        }
+      }
+    });
+  }, [data, days]);
 
   const containerStyle = {
     display: 'flex',
@@ -103,14 +146,14 @@ const StockChart = ({ data }) => {
     width: '90%',
     margin: '20px auto',
     padding: '20px',
-    backgroundColor: '#522546', // Darker background for container
+    backgroundColor: '#522546',
     borderRadius: '10px',
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
   };
 
   const chartStyle = {
     flex: 3,
-    backgroundColor: '#311D3F', // Dark background for chart
+    backgroundColor: '#311D3F',
     padding: '20px',
     borderRadius: '10px',
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
@@ -119,7 +162,7 @@ const StockChart = ({ data }) => {
   const filterStyle = {
     flex: 1,
     marginLeft: '20px',
-    backgroundColor: '#311D3F', // Dark background for filter
+    backgroundColor: '#311D3F',
     padding: '20px',
     borderRadius: '10px',
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
@@ -129,28 +172,31 @@ const StockChart = ({ data }) => {
     width: '100%',
     padding: '10px',
     borderRadius: '5px',
-    border: '1px solid #88304E', // Muted accent color for border
+    border: '1px solid #88304E',
     fontSize: '14px',
-    color: '#FFF2AF', // Soft yellow for text
-    backgroundColor: '#522546', // Darker background for select
+    color: '#FFF2AF',
+    backgroundColor: '#522546',
     cursor: 'pointer',
   };
 
   const labelStyle = {
     fontSize: '16px',
     fontWeight: 'bold',
-    color: '#FFF2AF', // Soft yellow for label text
+    color: '#FFF2AF',
     marginBottom: '10px',
   };
 
   return (
     <div style={containerStyle}>
-      {/* Chart Section */}
       <div style={chartStyle}>
-        <CanvasJSChart options={options} />
+        <ReactApexChart
+          options={options}
+          series={series}
+          type="candlestick"
+          height={500}
+        />
       </div>
 
-      {/* Filter Section */}
       <div style={filterStyle}>
         <h3 style={labelStyle}>Filter by Days</h3>
         <select

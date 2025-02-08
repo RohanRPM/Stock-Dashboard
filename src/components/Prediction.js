@@ -181,15 +181,15 @@ const Prediction = ({ stockData, selectedCompany }) => { // Add selectedCompany 
               <BarChart
                 data={[
                   {
-                    name: 'MAE',
+                    name: 'Mean Absolute Error (MAE)',
                     value: prediction.metrics.MAE.toFixed(2),
                   },
                   {
-                    name: 'MAPE',
+                    name: 'Mean Absolute Percentage Error (MAPE)',
                     value: (prediction.metrics.MAPE * 100).toFixed(2),
                   },
                   {
-                    name: 'MSE',
+                    name: 'Mean Squared Error (MSE)',
                     value: prediction.metrics.MSE.toFixed(2),
                   },
                 ]}
