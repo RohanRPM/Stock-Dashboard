@@ -1,4 +1,4 @@
-import React, { useState,useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import {
   LineChart,
@@ -13,6 +13,8 @@ import {
   Bar,
 } from 'recharts';
 import { DaysContext } from '../context/DaysContext';
+import { CirclesWithBar } from 'react-loader-spinner';
+
 const Prediction = ({ stockData, selectedCompany }) => { // Add selectedCompany prop
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -21,7 +23,7 @@ const Prediction = ({ stockData, selectedCompany }) => { // Add selectedCompany 
 
 
   const { days } = useContext(DaysContext); // Get days from context
-  
+
   // 3. Add day mapping same as StockChart
   const dayMapping = {
     '1d': 1,
@@ -41,6 +43,8 @@ const Prediction = ({ stockData, selectedCompany }) => { // Add selectedCompany 
   };
 
   const predictStock = async () => {
+    setLoading(true); // Set loading state before making the API request
+    setError(null);
     // 4. Calculate dates based on stockData and days context
     const numericalDays = dayMapping[days];
     const endDate = new Date(stockData[stockData.length - 1].Date);
@@ -115,6 +119,8 @@ const Prediction = ({ stockData, selectedCompany }) => { // Add selectedCompany 
   return (
     <div style={styles.predictionWrapper}>
       <h3 style={styles.title}>📊 Stock Prediction</h3>
+      {!loading && (
+
       <button
         onClick={predictStock}
         style={loading ? { ...styles.button, ...styles.buttonDisabled } : styles.button}
@@ -122,15 +128,27 @@ const Prediction = ({ stockData, selectedCompany }) => { // Add selectedCompany 
       >
         {loading ? 'Predicting...' : 'Get Prediction'}
       </button>
+      )}
 
-      {loading && <p style={styles.loading}>Loading prediction...</p>}
+     
 
-      {/* {error && (
-        <div style={styles.errorContainer}>
-          <p style={styles.error}>⚠️ {error}</p>
-          <p style={styles.errorHint}>Please ensure the prediction server is running and try again.</p>
+      {loading && (
+        <div style={styles.loaderContainer}>
+          <CirclesWithBar
+            height="100"
+            width="100"
+            color="#4fa94d"
+            outerCircleColor="#4fa94d"
+            innerCircleColor="#4fa94d"
+            barColor="#E52020"
+            ariaLabel="circles-with-bar-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+          />
+    
         </div>
-      )} */}
+      )}
 
       {prediction && (
         <div style={styles.resultContainer}>
@@ -199,7 +217,7 @@ const Prediction = ({ stockData, selectedCompany }) => { // Add selectedCompany 
                 <XAxis dataKey="name" stroke="#FFF2AF" />
                 <YAxis stroke="#FFF2AF" />
                 <Tooltip />
-                <Legend  />
+                <Legend />
                 <Bar dataKey="value" fill="#E23E57" /> {/* Vibrant accent color for bars */}
               </BarChart>
             </ResponsiveContainer>
@@ -211,6 +229,13 @@ const Prediction = ({ stockData, selectedCompany }) => { // Add selectedCompany 
 };
 
 const styles = {
+  loaderContainer:{
+    //center
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+  },
   predictionWrapper: {
     marginTop: '20px',
     padding: '20px',

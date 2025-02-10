@@ -4,6 +4,8 @@ import Filter from './Filter';
 import StockChart from './Chart';
 import Prediction from './Prediction';
 import LiveChart from './LiveChart';
+import { CirclesWithBar } from 'react-loader-spinner';
+
 
 const Dashboard = () => {
   const [selectedCompany, setSelectedCompany] = useState('HDFC');
@@ -35,7 +37,21 @@ const Dashboard = () => {
       {error ? (
         <p style={styles.error}>{error}</p>
       ) : loading ? (
-        <p style={styles.loading}>Loading data...</p>
+        <div style={styles.loaderContainer}>
+          <CirclesWithBar
+            height="100"
+            width="100"
+            color="#4fa94d"
+            outerCircleColor="#4fa94d"
+            innerCircleColor="#4fa94d"
+            barColor="#E52020"
+            ariaLabel="circles-with-bar-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+          />
+    
+        </div>
       ) : stockData && stockData.length > 0 ? (
         <div style={styles.chartWrapper}>
           <StockChart data={stockData} />
@@ -45,19 +61,26 @@ const Dashboard = () => {
         <p style={styles.noData}>No data available for the selected company.</p>
       )}
 
-      {/* Render LiveChart unconditionally */}
-      <LiveChart selectedCompany={selectedCompany} />
 
       {/* Optionally, Prediction can also be moved if it depends on stockData */}
       {stockData && stockData.length > 0 && (
         <Prediction stockData={stockData} selectedCompany={selectedCompany} />
       )}
+      {/* Render LiveChart unconditionally */}
+      <LiveChart selectedCompany={selectedCompany} />
     </div>
   );
 
 };
 
 const styles = {
+  loaderContainer:{
+    //center
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+  },
   dashboard: {
     fontFamily: 'Arial, sans-serif',
     textAlign: 'center',
