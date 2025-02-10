@@ -3,6 +3,7 @@ import { fetchStockData } from '../services/api';
 import Filter from './Filter';
 import StockChart from './Chart';
 import Prediction from './Prediction';
+import LiveChart from './LiveChart';
 
 const Dashboard = () => {
   const [selectedCompany, setSelectedCompany] = useState('HDFC');
@@ -30,24 +31,30 @@ const Dashboard = () => {
     <div style={styles.dashboard}>
       <h1 style={styles.title}>📈 Stock Dashboard</h1>
       <Filter selectedCompany={selectedCompany} setSelectedCompany={setSelectedCompany} />
+
       {error ? (
         <p style={styles.error}>{error}</p>
       ) : loading ? (
         <p style={styles.loading}>Loading data...</p>
       ) : stockData && stockData.length > 0 ? (
-        <>
-          <div style={styles.chartWrapper}>
-            <StockChart data={stockData} />
-          </div>
-          <Prediction stockData={stockData} 
-            selectedCompany= {selectedCompany}
-          />
-        </>
+        <div style={styles.chartWrapper}>
+          <StockChart data={stockData} />
+          {/* Properly aligned with StockChart */}
+        </div>
       ) : (
         <p style={styles.noData}>No data available for the selected company.</p>
       )}
+
+      {/* Render LiveChart unconditionally */}
+      <LiveChart selectedCompany={selectedCompany} />
+
+      {/* Optionally, Prediction can also be moved if it depends on stockData */}
+      {stockData && stockData.length > 0 && (
+        <Prediction stockData={stockData} selectedCompany={selectedCompany} />
+      )}
     </div>
   );
+
 };
 
 const styles = {
