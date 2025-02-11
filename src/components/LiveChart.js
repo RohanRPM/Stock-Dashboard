@@ -30,10 +30,11 @@ function candleReducer(state, action) {
 
         return {
           currentCandle: newCandle,
-          // Add the completed candle (if any) to the candles array and keep only the latest 50 candles.
+          // Add the completed candle (if any) to the candles array and keep only the latest 100 candles.
           candles: state.currentCandle
-            ? [...state.candles.slice(-49), state.currentCandle]
+            ? [...state.candles, state.currentCandle].slice(-9999) // Enforces max length of 100
             : state.candles,
+
         };
       }
 
@@ -105,7 +106,7 @@ const LiveChart = ({ selectedCompany = "Nifty Bank" }) => {
     : new Date().getTime();
 
   // Set the x-axis range to be the last 6 hours
-  const xAxisMin = latestTime -  20* 60 * 1000; // 6 hours in milliseconds
+  const xAxisMin = latestTime -  7* 60 * 1000; // 6 hours in milliseconds
   const xAxisMax = latestTime;
 
   // Chart configuration
@@ -154,6 +155,7 @@ const LiveChart = ({ selectedCompany = "Nifty Bank" }) => {
       },
     },
     plotOptions: {
+      //broader
       candlestick: {
         colors: {
           upward: "#00ff7f",
@@ -184,9 +186,10 @@ const LiveChart = ({ selectedCompany = "Nifty Bank" }) => {
   };
 
   // Combine the completed candles with the currently updating candle (if available)
-  const seriesData = state.currentCandle
-    ? [...state.candles, state.currentCandle]
-    : state.candles;
+  const seriesData = [...state.candles, state.currentCandle]
+  .filter(Boolean) // Remove any null values
+  .sort((a, b) => a.x - b.x); // Ensure chronological order
+
 
   return (
     <div
